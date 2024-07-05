@@ -1,66 +1,71 @@
 const { Schema, model, Types } = require('mongoose');
-const dateFormat = require('../utils/dateFormat');
+const moment = require('moment');
 
+// Reaction Schema (subdocument schema in Thought model)
 const reactionSchema = new Schema(
   {
     reactionId: {
       type: Schema.Types.ObjectId,
-      default: () => new Types.ObjectId()
+      default: () => new Types.ObjectId(),
     },
     reactionBody: {
       type: String,
       required: true,
-      maxlength: 280
+      maxlength: 280,
     },
     username: {
       type: String,
-      required: true
+      required: true,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: timestamp => dateFormat(timestamp)
-    }
+      get: (timestamp) => moment(timestamp).format('MMM DD, YYYY [at] hh:mm a'),
+    },
   },
   {
     toJSON: {
-      getters: true
-    }
+      getters: true,
+    },
+    id: false,
   }
 );
 
+// Thought Schema
 const thoughtSchema = new Schema(
   {
     thoughtText: {
       type: String,
       required: true,
       minlength: 1,
-      maxlength: 280
+      maxlength: 280,
     },
     createdAt: {
       type: Date,
       default: Date.now,
-      get: timestamp => dateFormat(timestamp)
+      get: (timestamp) => moment(timestamp).format('MMM DD, YYYY [at] hh:mm a'),
     },
     username: {
       type: String,
-      required: true
+      required: true,
     },
-    reactions: [reactionSchema]
+    reactions: [reactionSchema],
   },
   {
     toJSON: {
       virtuals: true,
-      getters: true
+      getters: true,
     },
-    id: false
+    id: false,
   }
 );
 
-thoughtSchema.virtual('reactionCount').get(function() {
+// Create a virtual called reactionCount that retrieves the length of the thought's reactions array field on query
+thoughtSchema.virtual('reactionCount').get(function () {
   return this.reactions.length;
 });
 
+// Initialize Thought model
 const Thought = model('Thought', thoughtSchema);
 
 module.exports = Thought;
