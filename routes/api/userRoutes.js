@@ -1,25 +1,11 @@
 const router = require('express').Router();
-const {
-  getAllUsers,
-  getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
-  addFriend,
-  removeFriend,
-} = require('../controllers/userController');
+const userController = require('../../controllers/userController');  // Adjusted path
 
-router.route('/')
-  .get(getAllUsers)
-  .post(createUser);
-
-router.route('/:id')
-  .get(getUserById)
-  .put(updateUser)
-  .delete(deleteUser);
-
-router.route('/:userId/friends/:friendId')
-  .post(addFriend)
-  .delete(removeFriend);
+// Define your routes using userController methods
+router.get('/', userController.getAllUsers);
+router.get('/:userId', userController.getUserById);
+router.post('/', userController.createUser);
+router.put('/:userId', userController.updateUser);
+router.delete('/:userId', userController.deleteUser);
 
 module.exports = router;
